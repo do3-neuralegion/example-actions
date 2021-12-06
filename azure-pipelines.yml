@@ -1,0 +1,37 @@
+# Docker
+- task: NexPloitScan@3
+  inputs:
+    apiToken: 'mj2ldlv.nexa.pq8uvufzzvnzfx9bsoomjlu7kqv0uesl'
+    hostname: 'nexploit.app'
+    module: 'dast'
+    discoveryTypes: 'crawler'
+    crawlerUrls: 'https://brokencrystals.com/'
+    scanTests: 'angular_csti,jwt,date_manipulation,cookie_security,csrf,directory_listing,dom_xss,file_upload,full_path_disclosure,header_security,http_method_fuzzing,secret_tokens,version_control_systems,wordpress'
+# Build a Docker image
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+- brokencrystals
+
+resources:
+- repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+- stage: Build
+  displayName: Build image
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: Docker@2
+      displayName: Build an image
+      inputs:
+        command: build
+        dockerfile: '**/Dockerfile'
+        tags: |
+          $(tag)
